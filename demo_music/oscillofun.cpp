@@ -12,6 +12,7 @@ WAVEHDR header;
 int main()
 {
 	short* pcm=new short[bufsize];
+	memset(pcm,0,bufsize*2);
 	waveform.wFormatTag=WAVE_FORMAT_PCM;
 	waveform.nSamplesPerSec=44100;
 	waveform.wBitsPerSample=16;
@@ -19,9 +20,6 @@ int main()
 	waveform.nAvgBytesPerSec=2*44100;
 	waveform.nBlockAlign=2;
 	waveform.cbSize=0;
-
-	HANDLE wait=CreateEvent(NULL,0,0,"");
-
 	header.lpData=(LPSTR)pcm;
 	header.dwBufferLength=bufsize*2;
 	header.dwBytesRecorded=0;
@@ -33,7 +31,7 @@ int main()
 		for(int j=data[i*3+1];j<data[i*3+2];j++)
 			pcm[j]+=(sin(pi/44100*data[i*3]*(j-data[i*3+1]))+1)*1024;
 	printf("done");
-	waveOutOpen(&out,WAVE_MAPPER,&waveform,(DWORD_PTR)&wait,0,CALLBACK_EVENT);
+	waveOutOpen(&out,WAVE_MAPPER,&waveform,(DWORD_PTR)nullptr,0,CALLBACK_NULL);
 	waveOutPrepareHeader(out,&header,sizeof(WAVEHDR));
 	waveOutWrite(out,&header,sizeof(WAVEHDR));
 	Sleep(bufsize/44.100);
